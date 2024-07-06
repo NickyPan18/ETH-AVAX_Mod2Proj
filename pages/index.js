@@ -3,10 +3,13 @@ import {ethers} from "ethers";
 import atm_abi from "../artifacts/contracts/Assessment.sol/Assessment.json";
 
 export default function HomePage() {
-  const [ethWallet, setEthWallet] = useState(undefined);
-  const [account, setAccount] = useState(undefined);
-  const [atm, setATM] = useState(undefined);
-  const [balance, setBalance] = useState(undefined);
+  // State variables
+  const [ethWallet, setEthWallet] = useState(undefined); //Wallet
+  const [account, setAccount] = useState(undefined); //Account
+  const [atm, setATM] = useState(undefined); //Smart contract functionality
+  const [balance, setBalance] = useState(undefined); //Balance
+  const [investment, setInvest] = useState(undefined); //Balance
+
 
   const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const atmABI = atm_abi.abi;
@@ -44,7 +47,7 @@ export default function HomePage() {
     // once wallet is set we can get a reference to our deployed contract
     getATMContract();
   };
-
+  // Gets the provider and signer needed for the contract to work
   const getATMContract = () => {
     const provider = new ethers.providers.Web3Provider(ethWallet);
     const signer = provider.getSigner();
@@ -53,25 +56,73 @@ export default function HomePage() {
     setATM(atmContract);
   }
 
+  // Checks that atm object exists and then calls for the balance
   const getBalance = async() => {
     if (atm) {
       setBalance((await atm.getBalance()).toNumber());
     }
   }
 
-  const deposit = async() => {
+  const getInvest = async() => {
+    if (atm) {
+      setInvest((await atm.getInvest()).toNumber());
+    }
+  }
+
+  const deposit1 = async() => {
     if (atm) {
       let tx = await atm.deposit(1);
-      await tx.wait()
+      await tx.wait();
       getBalance();
     }
   }
 
-  const withdraw = async() => {
+  const deposit5 = async() => {
+    if (atm) {
+      let tx = await atm.deposit(5);
+      await tx.wait();
+      getBalance();
+    }
+  }
+
+
+  const withdraw1 = async() => {
     if (atm) {
       let tx = await atm.withdraw(1);
-      await tx.wait()
+      await tx.wait();
       getBalance();
+      
+    }
+  }
+
+  const withdraw5 = async() => {
+    if (atm) {
+      let tx = await atm.withdraw(5);
+      await tx.wait();
+      getBalance();
+      
+    }
+  }
+
+
+
+  const collect = async() => {
+    if (atm) {
+      let tx = await atm.collectInvest(4);
+      await tx.wait();
+      getBalance();
+      getInvest();
+      
+    }
+  }
+
+  const invest = async() => {
+    if (atm) {
+      let tx = await atm.investy(5);
+      await tx.wait();
+      getBalance();
+      getInvest();
+      
     }
   }
 
@@ -90,12 +141,29 @@ export default function HomePage() {
       getBalance();
     }
 
+    if (investment == undefined) {
+      getInvest();
+    }
+
     return (
       <div>
         <p>Your Account: {account}</p>
         <p>Your Balance: {balance}</p>
-        <button onClick={deposit}>Deposit 1 ETH</button>
-        <button onClick={withdraw}>Withdraw 1 ETH</button>
+        <p>Your Invested Amt: {investment}</p>
+        <p>Investment Return Value: {investment*4}</p>
+        <button onClick={deposit1}>Deposit 1 ETH</button> &nbsp;
+        <button onClick={withdraw1}>Withdraw 1 ETH</button>
+        <br></br>
+        <br></br>
+        <button onClick={deposit5}>Deposit 5 ETH</button> &nbsp;
+        <button onClick={withdraw5}>Withdraw 5 ETH</button>
+        <br></br>
+        <br></br>
+        <br></br>
+        <button onClick={collect}>Receive Investment</button> &nbsp;
+        <button onClick={invest}>Invest 5 ETH</button> 
+        <br></br>
+        <br></br>
       </div>
     )
   }
@@ -104,14 +172,24 @@ export default function HomePage() {
 
   return (
     <main className="container">
-      <header><h1>Welcome to the Metacrafters ATM!</h1></header>
-      {initUser()}
       <style jsx>{`
         .container {
-          text-align: center
+          text-align: center;
+          background-color: lavender;
+          font-family: 'Courier New', Courier, monospace;
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
         }
       `}
       </style>
+      <br></br>
+        <br></br>
+      <header><h1>Welcome to the Metacrafters ATM!</h1></header>
+      {initUser()}
+      <br></br>
+        <br></br>
     </main>
   )
 }
